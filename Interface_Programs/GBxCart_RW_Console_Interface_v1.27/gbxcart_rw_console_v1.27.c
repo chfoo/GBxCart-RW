@@ -74,6 +74,7 @@ int main(int argc, char **argv) {
 				 "6. Specify Cart RAM\n"\
 				 "7. Custom commands\n"\
 				 "8. Other options\n"\
+				 "M. Multicart bootleg setup\n"\
 				 "x. Exit\n>"); 
 		char optionSelected = read_one_letter();
 		
@@ -1721,6 +1722,43 @@ int main(int argc, char **argv) {
 			}
 		}
 		
+		else if (optionSelected == 'M') { // Exit
+			printf("Which cart: \n");
+			printf("1. 2-in-1 Pokemon Gold & Silver \n");
+				
+			char cartSelected = read_one_letter();
+
+			printf("Cursor index (0 based): \n");
+
+			char cursorText[5];
+			int cursorIndex;
+			fgets(cursorText, sizeof cursorText, stdin);
+			fflush(stdin);
+			sscanf(cursorText, "%d", &cursorIndex);
+
+			printf("Using cart %c, cursor index %d...\n", cartSelected, cursorIndex);
+
+			if (cartSelected == '1') {
+				const uint8_t CD00 = 0x00;
+				const uint8_t CD01 = 0x20;
+				const uint8_t CD0A = 0x1A;
+				const uint8_t CD0B = 0x1A;
+				const uint8_t CD1E = 0x02;
+				const uint8_t CD1F = 0x12;
+				const uint8_t CD28 = 0x80;
+				const uint8_t CD29 = 0x90;
+
+				set_bank(0x2000, 1);
+				set_bank(0x7000, 0xAA); // ???
+				set_bank(0xa000, cursorIndex == 0 ? CD00 : CD01);
+				set_bank(0xa000, cursorIndex == 0 ? CD0A : CD0B);
+				set_bank(0xb000, cursorIndex == 0 ? CD1E : CD1F);
+				set_bank(0xa000, cursorIndex == 0 ? CD28 : CD29);
+
+				printf("Bootleg memory bank controller magic has been sent.\n");
+			}
+		}
+
 		else if (optionSelected == 'x') { // Exit
 			inLoop = false;
 		}
