@@ -1725,20 +1725,21 @@ int main(int argc, char **argv) {
 		else if (optionSelected == 'M') { // Exit
 			printf("Which cart: \n");
 			printf("1. 2-in-1 Pokemon Gold & Silver \n");
+			printf("2. 108-in-1 (First game only) \n");
 				
 			char cartSelected = read_one_letter();
 
-			printf("Cursor index (0 based): \n");
-
-			char cursorText[5];
-			int cursorIndex;
-			fgets(cursorText, sizeof cursorText, stdin);
-			fflush(stdin);
-			sscanf(cursorText, "%d", &cursorIndex);
-
-			printf("Using cart %c, cursor index %d...\n", cartSelected, cursorIndex);
-
 			if (cartSelected == '1') {
+				printf("Cursor index (0 based): \n");
+
+				char cursorText[5];
+				int cursorIndex;
+				fgets(cursorText, sizeof cursorText, stdin);
+				fflush(stdin);
+				sscanf(cursorText, "%d", &cursorIndex);
+
+				printf("Using cart %c, cursor index %d...\n", cartSelected, cursorIndex);
+
 				const uint8_t CD00 = 0x00;
 				const uint8_t CD01 = 0x20;
 				const uint8_t CD0A = 0x1A;
@@ -1755,8 +1756,24 @@ int main(int argc, char **argv) {
 				set_bank(0xb000, cursorIndex == 0 ? CD1E : CD1F);
 				set_bank(0xa000, cursorIndex == 0 ? CD28 : CD29);
 
-				printf("Bootleg memory bank controller magic has been sent.\n");
+			} else if (cartSelected == '2') {
+				set_bank(0x5000, 0xAA);
+				set_bank(0x4000, 0x00);
+				set_bank(0x2100, 0x01);
+
+				set_bank(0x2100, 0x01);
+				set_bank(0x7BE0, 0xE0);
+				set_bank(0x5000, 0xbb);
+				set_bank(0x4000, 0x00);
+				set_bank(0x7B20, 0x20);
+				set_bank(0x5000, 0x55);
+				set_bank(0x7B82, 0x82);
+			} else {
+				printf("Invalid selection.\n");
+				continue;
 			}
+
+			printf("Bootleg memory bank controller magic has been sent.\n");
 		}
 
 		else if (optionSelected == 'x') { // Exit
